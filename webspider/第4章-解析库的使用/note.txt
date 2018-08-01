@@ -1,0 +1,55 @@
+一、使用lxml：
+    引入lxml.etree
+
+    1、转换为可解析对象<lxml.etree_Element>：
+字符串：
+    html = etree.HTML(string)
+文件：
+    html = etree.parse(path, etree.HTMLParser())
+转换为bytes：
+    text = etree.tostring(html)，还可以进一步decode为str。
+
+    2、xpath的使用
+任意节点：
+    result = html.xpath('//ul/a')选取所有ul节点的直接子节点a
+    result = html.xpath('//a[@href = '...']/../@class')选取所有href属性为...的a节点的父节点，获取该父节点的class属性
+获取节点内部的文本信息：
+    result = html.xpath('//li//text()')获取li节点内所有的文本信息
+    result = html.xpath('//li/text()')获取li节点内的文本信息（不包括li节点内节点的文本信息）
+属性多值匹配和多属性匹配：
+    result = html.xpath('//li[contains(@class, '...')]/a/text()')获取含有class = ...属性的li节点内的a节点的直接文本信息
+    result = html.xpath('//li[contains(@class, '..1') and @name = '..2']/a/text()')获取含有calss = ..1属性和name = ..2属性的li节点内的a节点的直接文本信息
+按顺序选取：
+    result = html.xpath('//li[1]/a/text()')
+    result = html.xpath('//li[last()]/a/text()')
+    result = html.xpath('//li[position() < 3]/a/text()')
+    result = html.xpath('//li[last() - 2]/a/text()')
+节点轴：
+    result = html.xpath('//li[1]/ancestor::*')第一个li节点的所有（*）祖先（ancestor）节点
+    result = html.xpath('//li[1]/attribute::*')
+    result = html.xpath('//li[1]/child::a[@href = '...']')直接子节点
+    result = html.xpath('//li[1]/descendant::a')所有子孙节点
+    result = html.xpath('//li[1]/following::*[2]')之后的节点
+    result = html.xpath('//li[1]/following-sibling::*')之后的同级节点
+
+二、使用Beautiful Soup:
+    1、beautisoup使用的解析器：
+    html.parser、lxml、xml、html5lib
+    2、用法
+    初始化：soup = BeautifulSoup(html, 'lxml')
+    标准缩进格式输出：soup.prettify
+    节点选择器：
+        soup.title.string（节点内的文本信息）（深入内部搜寻所有节点，返回第一个该节点的直接文本信息）
+        soup.title.name（节点名称）
+        soup.title.attrs(以字典的形势返回节点的多个属性)（另soup.title[指定属性]）注意判断返回值的类型（字符串或列表）
+        soup.p.contents（以列表形式返回p的直接子节点和文本信息）
+        soup.p.children（以生成器形式返回p的直接子节点和文本信息）
+        soup.p.descendants（以生成器形式返回p的直接子孙节点和文本信息）
+        soup.p.parent（返回父节点）
+        soup.p.parents（以生成器的形式返回所有祖先节点）
+        同级节点：next_sibling(s)、previous_sibling(s)
+    方法选择器：
+        find_all(name = '*', attrs = { '*' = '*' }, text = string or re.compile(string))
+        find()、find_previous_siblings()、find_parents()、find_all_next()...
+    CSS选择器：
+        http://www.w3school.com.cn/cssref/css_selectors.asp
